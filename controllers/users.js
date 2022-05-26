@@ -28,55 +28,23 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
+      } else if (err.code === 11000) {
+        next(new ConflictError('Передан уже зарегистрированный email.'));
       } else {
         next(err);
       }
     });
 };
 
-// const updateUser = (req, res, next) => {
-//   const newUserName = req.body.name;
-//   const newUserEmail = req.body.email;
-//   const userId = req.user._id;
-//   User.findByIdAndUpdate(
-//     userId,
-//     {
-//       name: newUserName,
-//       email: newUserEmail,
-//     },
-//     { new: true, runValidators: true },
-//   )
-//     .then((user) => {
-//       if (!user) {
-//         throw new NotFoundError(`Пользователь ${essenceNotFound}`);
-//       }
-//       return res.send(user);
-//     })
-//     .catch((err) => {
-//       if (err.name === 'ValidationError' || err.name === 'CastError') {
-//         throw new BadRequestError(wrongData);
-//       } else if (err.name === 'MongoError') {
-//         throw new EmailError(emailAlreadyRegistered);
-//       } else {
-//         next(err);
-//       }
-//     })
-//     .catch(next);
-// };
-
 // POST /signup — создаёт пользователя
 const createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-
+  const { name, email, password } = req.body;
   if (!email || !password) {
     next(new BadRequestError('Поля email и password обязательны.'));
   }
-
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
+      name, email, password: hash,
     }))
     .then((user) => {
       const newUser = user.toObject();
