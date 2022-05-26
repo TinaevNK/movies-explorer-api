@@ -2,11 +2,11 @@ const router = require('express').Router();
 const userRouter = require('./users');
 const movieRouter = require('./movies');
 const { createUser, login } = require('../controllers/users');
-// const { validateCreateUser, validateLogin } = require('../middlewares/validations');
+const { validateCreateUser, validateLogin } = require('../middlewares/validations');
 const NotFoundError = require('../errors/not-found-error');
 
-router.post('/signup', createUser);
-router.post('/signin', login);
+router.post('/signup', validateCreateUser, createUser);
+router.post('/signin', validateLogin, login);
 
 router.use('/users', userRouter);
 router.use('/movies', movieRouter);

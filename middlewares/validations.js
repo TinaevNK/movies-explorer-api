@@ -1,12 +1,17 @@
 const { celebrate, Joi } = require('celebrate');
-const { LINK_REGEX } = require('../constants');
+const isURL = require('validator/lib/isURL');
+
+const validationUrl = (value, helpers) => {
+  if (isURL(value)) {
+    return value;
+  }
+  return helpers.message('Некорректный адрес URL.');
+};
 
 // POST /signup
 const validateCreateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(LINK_REGEX),
+    name: Joi.string().required().min(2).max(30),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -20,51 +25,42 @@ const validateLogin = celebrate({
   }),
 });
 
-// GET /users/:userId
-const validateGetUserById = celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().required().length(24).hex(),
-  }),
-});
-
 // PATCH /users/me
 const validateUpdateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-  }),
-});
-
-// PATCH /users/me/avatar
-const validateUpdateAvatar = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(LINK_REGEX),
-  }),
-});
-
-// POST /cards
-const validateCreateCard = celebrate({
-  body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(LINK_REGEX),
+    email: Joi.string().required().email(),
   }),
 });
 
-// DELETE /cards/:cardId
-// PUT /cards/:cardId/likes
-// DELETE /cards/:cardId/likes
-const validateCardId = celebrate({
+// POST /movies
+const validateCreateMovie = celebrate({
+  body: Joi.object().keys({
+    country: Joi.string().required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.string().required().custom(validationUrl),
+    trailerLink: Joi.string().required().custom(validationUrl),
+    thumbnail: Joi.string().required().custom(validationUrl),
+    movieId: Joi.number().required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
+  }),
+});
+
+// DELETE /movies/:movieId
+const validateDeleteMovie = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required().length(24).hex(),
+    movieId: Joi.string().required().length(24).hex(),
   }),
 });
 
 module.exports = {
-  validateGetUserById,
-  validateUpdateUser,
-  validateUpdateAvatar,
   validateCreateUser,
   validateLogin,
-  validateCreateCard,
-  validateCardId,
+  validateUpdateUser,
+  validateCreateMovie,
+  validateDeleteMovie,
 };
