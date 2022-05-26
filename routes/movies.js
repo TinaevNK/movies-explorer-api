@@ -14,6 +14,6 @@ const auth = require('../middlewares/auth');
 router.use(auth);
 router.get('/', getMovies);
 router.post('/', createMovie);
-router.delete('/:_id', deleteMovie);
+router.delete('/:movieId', deleteMovie);
 
 module.exports = router;

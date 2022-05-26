@@ -1,86 +1,70 @@
-const Card = require('../models/movie');
+const Movie = require('../models/movie');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const ForbiddenError = require('../errors/forbidden-error');
 
-// GET /cards — возвращает все карточки
-const getCards = (req, res, next) => {
-  Card.find({})
-    .then((cards) => res.send(cards.reverse()))
+// GET /movies — возвращает все сохранённые текущим  пользователем фильмы
+const getMovies = (req, res, next) => {
+  Movie.find({})
+    .then((movies) => res.send(movies.reverse()))
     .catch(next);
 };
 
-// POST /cards — создаёт карточку
-const createCard = (req, res, next) => {
-  const { name, link } = req.body;
-
-  Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send(card))
+// POST /movies — создаёт фильм с переданными в теле данными
+const createMovie = (req, res, next) => {
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailer,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+  } = req.body;
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailer,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+    owner: req.user._id,
+  })
+    .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
+        next(new BadRequestError('Переданы некорректные данные при создании фильма.'));
       } else {
         next(err);
       }
     });
 };
 
-// DELETE /cards/:cardId — удаляет карточку по идентификатору
-const deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
-    .orFail(() => next(new NotFoundError('Карточка с указанным _id не найдена.')))
+// DELETE /movies/:movieId — удаляет сохранённый фильм по id
+const deleteMovie = (req, res, next) => {
+  Movie.findById(req.params.movieId)
+    .orFail(() => next(new NotFoundError('Фильм с указанным _id не найден.')))
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        next(new ForbiddenError('Попытка удалить чужую карточку.'));
+        next(new ForbiddenError('Попытка удалить чужой фильм.'));
       } else {
-        Card.findByIdAndRemove(req.params.cardId)
+        Movie.findByIdAndRemove(req.params.movieId)
           .then(() => res.send(card))
           .catch(next);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные при удалении карточки.'));
-      } else {
-        next(err);
-      }
-    });
-};
-
-// Хочу поблагодорить лично за такое качественное и быстрое ревью! Надеюсь всё правильно понял
-// Ошибки исправил, код немного порефакторил
-// Спасибо ещё раз и хороших праздников!
-
-// PUT /cards/:cardId/likes — поставить лайк карточке
-const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true },
-  )
-    .orFail(() => next(new NotFoundError('Передан несуществующий _id карточки.')))
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для постановки лайка.'));
-      } else {
-        next(err);
-      }
-    });
-};
-
-// DELETE /cards/:cardId/likes — убрать лайк с карточки
-const dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
-  )
-    .orFail(() => next(new NotFoundError('Передан несуществующий _id карточки.')))
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для снятии лайка.'));
+        next(new BadRequestError('Переданы некорректные данные при удалении фильма.'));
       } else {
         next(err);
       }
@@ -88,9 +72,7 @@ const dislikeCard = (req, res, next) => {
 };
 
 module.exports = {
-  getCards,
-  createCard,
-  deleteCard,
-  likeCard,
-  dislikeCard,
+  getMovies,
+  createMovie,
+  deleteMovie,
 };
