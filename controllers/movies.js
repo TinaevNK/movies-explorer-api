@@ -19,7 +19,7 @@ const createMovie = (req, res, next) => {
     year,
     description,
     image,
-    trailer,
+    trailerLink,
     thumbnail,
     movieId,
     nameRU,
@@ -32,7 +32,7 @@ const createMovie = (req, res, next) => {
     year,
     description,
     image,
-    trailer,
+    trailerLink,
     thumbnail,
     movieId,
     nameRU,
@@ -53,12 +53,12 @@ const createMovie = (req, res, next) => {
 const deleteMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
     .orFail(() => next(new NotFoundError('Фильм с указанным _id не найден.')))
-    .then((card) => {
-      if (!card.owner.equals(req.user._id)) {
+    .then((movie) => {
+      if (!movie.owner.equals(req.user._id)) {
         next(new ForbiddenError('Попытка удалить чужой фильм.'));
       } else {
         Movie.findByIdAndRemove(req.params.movieId)
-          .then(() => res.send(card))
+          .then(() => res.send(movie))
           .catch(next);
       }
     })
