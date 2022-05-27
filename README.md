@@ -66,5 +66,5 @@
 ---
 ## *Адрес сервера*
 
-* Запросы на бэкенд по [https://backend.movies-explorer.nomoredomains.xyz/api](https://backend.movies-explorer.nomoredomains.xyz/api);
+* Запросы на бэкенд по [https://backend.movies-explorer.nomoredomains.xyz](https://backend.movies-explorer.nomoredomains.xyz);
 * Публичный IP адрес сервера `51.250.23.182`.

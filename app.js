@@ -10,7 +10,7 @@ const router = require('./routes/routes');
 const errorHandler = require('./middlewares/error-handler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3001, NODE_ENV, DATABASE_URL } = process.env;
+const { PORT = 3000, NODE_ENV, DATABASE_URL } = process.env;
 
 const app = express();
 

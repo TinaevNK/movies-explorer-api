@@ -1,4 +1,4 @@
-const { ERROR_CODE_INTERNAL_SERVER_ERROR, SERVER_ERROR } = require('../utils/constants');
+const { ERROR_CODE_INTERNAL_SERVER_ERROR } = require('../utils/constants');
 
 module.exports = (err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
@@ -8,7 +8,7 @@ module.exports = (err, req, res, next) => {
     .send({
       // проверяем статус и выставляем сообщение в зависимости от него
       message: statusCode === ERROR_CODE_INTERNAL_SERVER_ERROR
-        ? SERVER_ERROR
+        ? message
         : message,
     });
   next();
