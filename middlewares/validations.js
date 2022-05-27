@@ -1,11 +1,12 @@
 const { celebrate, Joi } = require('celebrate');
 const isURL = require('validator/lib/isURL');
+const { WRONG_URL_FORMAT } = require('../utils/constants');
 
 const validationUrl = (value, helpers) => {
   if (isURL(value)) {
     return value;
   }
-  return helpers.message('Некорректный адрес URL.');
+  return helpers.message(WRONG_URL_FORMAT);
 };
 
 // POST /signup

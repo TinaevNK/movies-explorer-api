@@ -1,20 +1,23 @@
-// файл .env не выгружаю, но в нем записаны следующие данные:
-// NODE_ENV = production
-// JWT_SECRET = 'a4768f7eb2a93f64b0dcbc8998e135d1b14bf747b52ba2a7aaf11a2fe34cb2b0'
-// PORT = 3000
-
-const { NODE_ENV, JWT_SECRET = 'dev-key' } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
+const { devJwtKey } = require('../utils/config');
+const {
+  USER_NOT_FOUND,
+  WRONG_DATA_PROFILE,
+  WRONG_DATA_USER,
+  EMAIL_ALREADY_EXISTS,
+  EMAIL_AND_PASSWORD_REQUIRED,
+} = require('../utils/constants');
 
 // GET /users/me - возвращает информацию о текущем пользователе
 const getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(() => next(new NotFoundError('Пользователь по указанному _id не найден.')))
+    .orFail(() => next(new NotFoundError(USER_NOT_FOUND)))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -23,13 +26,13 @@ const getUserInfo = (req, res, next) => {
 const updateUser = (req, res, next) => {
   const { name, email } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
-    .orFail(() => next(new NotFoundError('Пользователь по указанному _id не найден.')))
+    .orFail(() => next(new NotFoundError(USER_NOT_FOUND)))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
+        next(new BadRequestError(WRONG_DATA_PROFILE));
       } else if (err.code === 11000) {
-        next(new ConflictError('Передан уже зарегистрированный email.'));
+        next(new ConflictError(EMAIL_ALREADY_EXISTS));
       } else {
         next(err);
       }
@@ -40,7 +43,7 @@ const updateUser = (req, res, next) => {
 const createUser = (req, res, next) => {
   const { name, email, password } = req.body;
   if (!email || !password) {
-    next(new BadRequestError('Поля email и password обязательны.'));
+    next(new BadRequestError(EMAIL_AND_PASSWORD_REQUIRED));
   }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -53,9 +56,9 @@ const createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+        next(new BadRequestError(WRONG_DATA_USER));
       } else if (err.code === 11000) {
-        next(new ConflictError('Передан уже зарегистрированный email.'));
+        next(new ConflictError(EMAIL_ALREADY_EXISTS));
       } else {
         next(err);
       }
@@ -67,7 +70,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials({ email, password })
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : devJwtKey, { expiresIn: '7d' });
       res.send({ token });
     })
     .catch(next);

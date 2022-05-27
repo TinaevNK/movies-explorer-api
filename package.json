@@ -1,7 +1,7 @@
 {
   "name": "movies-explorer-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Дипломный проект - бэкенд сайта по поиску фильмов",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
