@@ -9,7 +9,6 @@ const ACCESS_ERROR = 'Попытка удалить чужой фильм.';
 const MOVIE_NOT_FOUND = 'Фильм с указанным _id не найден.';
 const WRONG_DATA_MOVIE_DELETE = 'Переданы некорректные данные при удалении фильма.';
 const WRONG_DATA_MOVIE = 'Переданы некорректные данные при создании фильма.';
-const EMAIL_AND_PASSWORD_REQUIRED = 'Поля email и password обязательны.';
 const EMAIL_ALREADY_EXISTS = 'Передан уже зарегистрированный email.';
 const WRONG_DATA_USER = 'Переданы некорректные данные при создании пользователя.';
 const WRONG_DATA_PROFILE = 'Переданы некорректные данные при обновлении профиля.';
@@ -32,7 +31,6 @@ module.exports = {
   MOVIE_NOT_FOUND,
   WRONG_DATA_MOVIE_DELETE,
   WRONG_DATA_MOVIE,
-  EMAIL_AND_PASSWORD_REQUIRED,
   EMAIL_ALREADY_EXISTS,
   WRONG_DATA_USER,
   WRONG_DATA_PROFILE,

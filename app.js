@@ -14,11 +14,11 @@ const { PORT = 3000, NODE_ENV, DATABASE_URL } = process.env;
 
 const app = express();
 
+app.use(requestLogger);
+app.use(limiter); // подключаем rate-limiter
 app.use(cors());
 app.use(bodyParser.json()); // для собирания JSON-формата
 app.use(helmet()); // настраиваем заголовки
-app.use(requestLogger);
-app.use(limiter); // подключаем rate-limiter
 app.use(router);
 app.use(errorLogger);
 app.use(errors()); // обработчик ошибок celebrate

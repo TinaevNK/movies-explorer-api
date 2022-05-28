@@ -11,7 +11,6 @@ const {
   WRONG_DATA_PROFILE,
   WRONG_DATA_USER,
   EMAIL_ALREADY_EXISTS,
-  EMAIL_AND_PASSWORD_REQUIRED,
 } = require('../utils/constants');
 
 // GET /users/me - возвращает информацию о текущем пользователе
@@ -42,9 +41,6 @@ const updateUser = (req, res, next) => {
 // POST /signup — создаёт пользователя
 const createUser = (req, res, next) => {
   const { name, email, password } = req.body;
-  if (!email || !password) {
-    next(new BadRequestError(EMAIL_AND_PASSWORD_REQUIRED));
-  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, email, password: hash,
